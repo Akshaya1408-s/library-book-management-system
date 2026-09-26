@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library Book Management System</title>
+  <meta name="description" content="A simple, beginner-friendly college library book management system built with HTML, CSS, and JavaScript using localStorage." />
+  <meta property="og:title" content="Library Book Management System" />
+  <meta property="og:description" content="A simple, beginner-friendly college library book management system built with HTML, CSS, and JavaScript using localStorage." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Link to the clean custom stylesheet -->
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+  <!-- Floating Toast Notification for user feedback -->
+  <div id="notification-banner" class="notification-banner"></div>
+
+  <!-- Mobile Top Bar (Visible only on smaller screens) -->
+  <header class="mobile-topbar">
+    <div style="font-weight: 700; font-size: 16px;">📚 College Library System</div>
+    <button class="mobile-menu-toggle" id="mobile-toggle" aria-label="Toggle navigation menu">☰</button>
+  </header>
+
+  <div class="app-container">
+
+    <!-- =========================================================================
+         SIDEBAR NAVIGATION
+         ========================================================================= -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-icon">📚</div>
+        <div class="brand-info">
+          <h2>Campus Library</h2>
+          <p>Book Management</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-label">Main Menu</div>
+        <button class="nav-btn active" data-target="section-dashboard">
+          <span class="nav-icon">📊</span>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-btn" data-target="section-view-books">
+          <span class="nav-icon">📖</span>
+          <span>View All Books</span>
+          <span class="badge-pill" id="nav-badge-all">5</span>
+        </button>
+        <button class="nav-btn" data-target="section-available-books">
+          <span class="nav-icon">✅</span>
+          <span>Available Books</span>
+          <span class="badge-pill" id="nav-badge-avail">5</span>
+        </button>
+
+        <div class="nav-label">Circulation Desk</div>
+        <button class="nav-btn" data-target="section-add-book">
+          <span class="nav-icon">➕</span>
+          <span>Add New Book</span>
+        </button>
+        <button class="nav-btn" data-target="section-issue-book">
+          <span class="nav-icon">📤</span>
+          <span>Issue Book</span>
+        </button>
+        <button class="nav-btn" data-target="section-return-book">
+          <span class="nav-icon">📥</span>
+          <span>Return Book</span>
+        </button>
+        <button class="nav-btn" data-target="section-transactions">
+          <span class="nav-icon">📜</span>
+          <span>Transaction History</span>
+        </button>
+
+        <div class="nav-label">College Viva</div>
+        <button class="nav-btn" data-target="section-viva">
+          <span class="nav-icon">🎓</span>
+          <span>Viva Q&amp;A Guide</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="reset-btn" id="reset-sample-btn" title="Reset all data back to original 5 sample books">
+          <span>🔄</span>
+          <span>Reset Sample Data</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- =========================================================================
+         MAIN APPLICATION CONTENT
+         ========================================================================= -->
+    <main class="main-content">
+
+      <!-- SECTION 1: DASHBOARD -->
+      <section id="section-dashboard" class="content-view active">
+        <div class="page-header">
+          <div>
+            <h1>Library Dashboard</h1>
+            <p>Welcome to the College Library Management System. Here is an overview of the library collection.</p>
+          </div>
+        </div>
+
+        <!-- 4 Statistics Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-details">
+              <h3>Total Book Titles</h3>
+              <div class="stat-number" id="stat-total-books">0</div>
+              <div class="stat-subtext">Registered in catalog</div>
+            </div>
+            <div class="stat-icon blue">📚</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-details">
+              <h3>Available Copies</h3>
+              <div class="stat-number" id="stat-available-books">0</div>
+              <div class="stat-subtext">Ready on library shelves</div>
+            </div>
+            <div class="stat-icon green">✅</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-details">
+              <h3>Issued Copies</h3>
+              <div class="stat-number" id="stat-issued-books">0</div>
+              <div class="stat-subtext">Currently with students</div>
+            </div>
+            <div class="stat-icon amber">📤</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-details">
+              <h3>Total Transactions</h3>
+              <div class="stat-number" id="stat-total-transactions">0</div>
+              <div class="stat-subtext">Issue &amp; return records</div>
+            </div>
+            <div class="stat-icon purple">📜</div>
+          </div>
+        </div>
+
+        <!-- Quick Navigation Bar -->
+        <div class="dashboard-actions-card">
+          <h2>Quick Actions</h2>
+          <div class="quick-action-buttons">
+            <button class="quick-btn primary" onclick="navigateTo('section-add-book')">
+              ➕ Add New Book
+            </button>
+            <button class="quick-btn primary" onclick="navigateTo('section-issue-book')">
+              📤 Issue a Book
+            </button>
+            <button class="quick-btn" onclick="navigateTo('section-return-book')">
+              📥 Return a Book
+            </button>
+            <button class="quick-btn" onclick="navigateTo('section-available-books')">
+              ✅ View Available Books
+            </button>
+            <button class="quick-btn" onclick="navigateTo('section-viva')">
+              🎓 Viva Q&amp;A Notes
+            </button>
+          </div>
+        </div>
+
+        <!-- Recent Transactions Preview -->
+        <div class="card">
+          <div class="card-title">Recent Transactions</div>
+          <div class="card-subtitle">Last 5 circulation activities in the library</div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Txn ID</th>
+                  <th>Student</th>
+                  <th>Book Title</th>
+                  <th>Issue Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-recent-tbody">
+                <!-- Populated dynamically by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 2: VIEW ALL BOOKS & SEARCH -->
+      <section id="section-view-books" class="content-view">
+        <div class="page-header">
+          <div>
+            <h1>Library Catalog (All Books)</h1>
+            <p>Browse, search, and manage all books stored in the library inventory.</p>
+          </div>
+          <button class="btn btn-primary" onclick="navigateTo('section-add-book')">
+            ➕ Add New Book
+          </button>
+        </div>
+
+        <div class="card">
+          <!-- Search & Filter Controls -->
+          <div class="toolbar-container">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="search-books-input" placeholder="Search by Book Title, Author, or Book ID...">
+            </div>
+
+            <div class="filter-group">
+              <label for="filter-category" style="font-size: 13px; font-weight: 600; color: #475569;">Category:</label>
+              <select id="filter-category" class="filter-select">
+                <option value="all">All Categories</option>
+                <option value="Programming">Programming</option>
+                <option value="Algorithms">Algorithms</option>
+                <option value="Database">Database</option>
+                <option value="Networking">Networking</option>
+                <option value="Operating Systems">Operating Systems</option>
+                <option value="Mathematics">Mathematics</option>
+                <option value="General">General</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Books Table -->
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Book ID</th>
+                  <th>Book Title &amp; Details</th>
+                  <th>Author</th>
+                  <th>Category</th>
+                  <th>Total Qty</th>
+                  <th>Available</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="books-table-tbody">
+                <!-- Populated dynamically by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 3: AVAILABLE BOOKS -->
+      <section id="section-available-books" class="content-view">
+        <div class="page-header">
+          <div>
+            <h1>Available Books</h1>
+            <p>Books that currently have copies in stock and are ready for immediate issue.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">In-Stock Books Ready to Issue</div>
+          <div class="card-subtitle">Showing only titles with available copies greater than 0</div>
+
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Book ID</th>
+                  <th>Title</th>
+                  <th>Author</th>
+                  <th>Category</th>
+                  <th>Copies Available</th>
+                  <th>Total Inventory</th>
+                  <th>Quick Action</th>
+                </tr>
+              </thead>
+              <tbody id="available-books-tbody">
+                <!-- Populated dynamically by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 4: ADD BOOK -->
+      <section id="section-add-book" class="content-view">
+        <div class="page-header">
+          <div>
+            <h1>Add New Book</h1>
+            <p>Enter the details of the new book to add it into the library catalog.</p>
+          </div>
+        </div>
+
+        <div class="card" style="max-width: 800px;">
+          <div class="card-title">Book Information Form</div>
+          <div class="card-subtitle">Fill in all required fields. Data will be saved in localStorage.</div>
+
+          <form id="add-book-form">
+            <div class="form-grid">
+              
+              <!-- Book ID -->
+              <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <label for="book-id">Book ID <span class="required">*</span></label>
+                  <button type="button" id="btn-generate-id" class="btn-sm btn-issue" style="padding: 2px 8px; font-size: 11px;">
+                    Auto-Generate
+                  </button>
+                </div>
+                <input type="text" id="book-id" class="form-control" placeholder="e.g. BK-106" required>
+                <span class="form-help">Unique identifier for this book</span>
+              </div>
+
+              <!-- ISBN -->
+              <div class="form-group">
+                <label for="book-isbn">ISBN Number</label>
+                <input type="text" id="book-isbn" class="form-control" placeholder="e.g. 978-0132350884">
+                <span class="form-help">International Standard Book Number</span>
+              </div>
+
+              <!-- Book Title -->
+              <div class="form-group form-full-width">
+                <label for="book-title">Book Title <span class="required">*</span></label>
+                <input type="text" id="book-title" class="form-control" placeholder="e.g. Clean Architecture" required>
+              </div>
+
+              <!-- Author -->
+              <div class="form-group">
+                <label for="book-author">Author Name <span class="required">*</span></label>
+                <input type="text" id="book-author" class="form-control" placeholder="e.g. Robert C. Martin" required>
+              </div>
+
+              <!-- Category -->
+              <div class="form-group">
+                <label for="book-category">Category / Subject <span class="required">*</span></label>
+                <select id="book-category" class="form-control" required>
+                  <option value="" disabled selected>-- Select Category --</option>
+                  <option value="Programming">Programming</option>
+                  <option value="Algorithms">Algorithms</option>
+                  <option value="Database">Database</option>
+                  <option value="Networking">Networking</option>
+                  <option value="Operating Systems">Operating Systems</option>
+                  <option value="Mathematics">Mathematics</option>
+                  <option value="General">General</option>
+                </select>
+              </div>
+
+              <!-- Quantity -->
+              <div class="form-group">
+                <label for="book-quantity">Quantity (Number of Copies) <span class="required">*</span></label>
+                <input type="number" id="book-quantity" class="form-control" min="1" max="100" value="3" required>
+                <span class="form-help">Initial number of physical copies in library</span>
+              </div>
+
+            </div>
+
+            <div class="form-actions" style="margin-top: 24px;">
+              <button type="submit" class="btn btn-primary">
+                ➕ Add Book to Catalog
+              </button>
+              <button type="reset" class="btn btn-secondary">
+                Clear Form
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- SECTION 5: ISSUE BOOK -->
+      <section id="section-issue-book" class="content-view">
+        <div class="page-header">
+          <div>
+            <h1>Issue Book to Student</h1>
+            <p>Record a book borrowing transaction for a student.</p>
+          </div>
+        </div>
+
+        <div class="card" style="max-width: 800px;">
+          <div class="card-title">Book Issue Form</div>
+          <div class="card-subtitle">Issuing decreases available copies by 1 and records the transaction.</div>
+
+          <form id="issue-book-form">
+            <div class="form-grid">
+              
+              <!-- Student ID -->
+              <div class="form-group">
+                <label for="issue-student-id">Student Roll / ID <span class="required">*</span></label>
+                <input type="text" id="issue-student-id" class="form-control" placeholder="e.g. STU-2024-05" required>
+                <span class="form-help">Unique college student identifier</span>
+              </div>
+
+              <!-- Student Name -->
+              <div class="form-group">
+                <label for="issue-student-name">Student Full Name <span class="required">*</span></label>
+                <input type="text" id="issue-student-name" class="form-control" placeholder="e.g. Rohit Sharma" required>
+              </div>
+
+              <!-- Book Selection Dropdown -->
+              <div class="form-group form-full-width">
+                <label for="issue-book-select">Select Book to Issue <span class="required">*</span></label>
+                <select id="issue-book-select" class="form-control" required>
+                  <option value="" disabled selected>-- Select an Available Book --</option>
+                  <!-- Populated dynamically by JavaScript -->
+                </select>
+                <span class="form-help">Only books with available copies are listed here</span>
+              </div>
+
+              <!-- Issue Date -->
+              <div class="form-group">
+                <label for="issue-date">Issue Date <span class="required">*</span></label>
+                <input type="date" id="issue-date" class="form-control" required>
+                <span class="form-help">Defaults to today</span>
+              </div>
+
+              <!-- Due Date -->
+              <div class="form-group">
+                <label for="issue-due-date">Due Return Date <span class="required">*</span></label>
+                <input type="date" id="issue-due-date" class="form-control" required>
+                <span class="form-help">Defaults to 14 days from today</span>
+              </div>
+
+            </div>
+
+            <div class="form-actions" style="margin-top: 24px;">
+              <button type="submit" class="btn btn-primary">
+                📤 Confirm &amp; Issue Book
+              </button>
+              <button type="button" class="btn btn-secondary" onclick="navigateTo('section-view-books')">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- SECTION 6: RETURN BOOK -->
+      <section id="section-return-book" class="content-view">
+        <div class="page-header">
+          <div>
+            <h1>Return an Issued Book</h1>
+            <p>Process returned books to restore stock and close the borrowing transaction.</p>
+          </div>
+        </div>
+
+        <!-- Option A: One-click return from active issued list -->
+        <div class="card">
+          <div class="card-title">Currently Issued Books (Quick Return)</div>
+          <div class="card-subtitle">Click "Return Book" next to any student record to instantly process the return.</div>
+
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Txn ID</th>
+                  <th>Student Info</th>
+                  <th>Book Details</th>
+                  <th>Issue Date</th>
+                  <th>Due Date</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="active-issued-tbody">
+                <!-- Populated dynamically by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Option B: Manual return form by Student ID & Book ID -->
+        <div class="card" style="max-width: 800px;">
+          <div class="card-title">Manual Return Verification Form</div>
+          <div class="card-subtitle">Alternatively, enter the Student ID and Book ID manually.</div>
+
+          <form id="return-book-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="return-student-id">Student ID <span class="required">*</span></label>
+                <input type="text" id="return-student-id" class="form-control" placeholder="e.g. STU-2024-01" required>
+              </div>
+
+              <div class="form-group">
+                <label for="return-book-id">Book ID <span class="required">*</span></label>
+                <input type="text" id="return-book-id" class="form-control" placeholder="e.g. BK-101" required>
+              </div>
+            </div>
+
+            <div class="form-actions" style="margin-top: 20px;">
+              <button type="submit" class="btn btn-primary">
+                📥 Process Return
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- SECTION 7: TRANSACTION HISTORY -->
+      <section id="section-transactions" class="content-view">
+        <div class="page-header">
+          <div>
+            <h1>Transaction History</h1>
+            <p>Complete audit log of all book issues and returns.</p>
+          </div>
+
+          <div class="filter-group">
+            <label for="filter-transactions" style="font-size: 13px; font-weight: 600; color: #475569;">Show:</label>
+            <select id="filter-transactions" class="filter-select">
+              <option value="all">All Transactions</option>
+              <option value="Issued">Currently Issued Only</option>
+              <option value="Returned">Returned Only</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Txn ID</th>
+                  <th>Student ID</th>
+                  <th>Student Name</th>
+                  <th>Book ID</th>
+                  <th>Book Title</th>
+                  <th>Issue Date</th>
+                  <th>Due Date</th>
+                  <th>Return Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="transactions-table-tbody">
+                <!-- Populated dynamically by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 8: COLLEGE VIVA PREPARATION GUIDE -->
+      <section id="section-viva" class="content-view">
+        <div class="page-header">
+          <div>
+            <h1>College Viva &amp; Project Explanation Guide</h1>
+            <p>Key concepts and sample answers to help you explain this project with confidence during your viva examination.</p>
+          </div>
+        </div>
+
+        <div class="viva-card">
+          <div class="viva-question">1. What is the objective of this project?</div>
+          <div class="viva-answer">
+            This project is a <strong>Library Book Management System</strong> created to automate core library operations: cataloging books, tracking inventory (total vs. available copies), managing book issues and returns for students, and keeping an audit log of transactions.
+          </div>
+        </div>
+
+        <div class="viva-card">
+          <div class="viva-question">2. What technologies are used, and why no heavy backend?</div>
+          <div class="viva-answer">
+            The project strictly uses fundamental web technologies:
+            <ul style="margin: 8px 0 8px 20px;">
+              <li><strong>HTML5:</strong> Defines semantic structure and interactive forms.</li>
+              <li><strong>CSS3:</strong> Provides responsive layout (Flexbox/Grid), cards, tables, and clean color schemes.</li>
+              <li><strong>JavaScript (Vanilla ES6):</strong> Handles application logic, DOM manipulation, form validation, and data management.</li>
+            </ul>
+            Instead of requiring a separate SQL/Node server, it utilizes the browser's native <strong>localStorage</strong> API, making the application zero-setup and runnable on any computer by simply opening <code class="code-badge">index.html</code> in any web browser.
+          </div>
+        </div>
+
+        <div class="viva-card">
+          <div class="viva-question">3. How does localStorage work in this project?</div>
+          <div class="viva-answer">
+            <code class="code-badge">localStorage</code> is a web storage API that saves key-value pairs persistently in the user's browser across page reloads.
+            Because localStorage only stores strings, we use:
+            <ul style="margin: 8px 0 8px 20px;">
+              <li><code class="code-badge">JSON.stringify(array)</code> when saving JavaScript objects to localStorage.</li>
+              <li><code class="code-badge">JSON.parse(string)</code> when retrieving and reconstructing the JavaScript array upon page load.</li>
+            </ul>
+            We maintain two storage keys: <code class="code-badge">college_library_books</code> and <code class="code-badge">college_library_transactions</code>.
+          </div>
+        </div>
+
+        <div class="viva-card">
+          <div class="viva-question">4. Explain the "Issue Book" business logic.</div>
+          <div class="viva-answer">
+            When a student issues a book:
+            <ol style="margin: 8px 0 8px 20px;">
+              <li>We check whether the chosen book exists and has <code class="code-badge">availableCopies &gt; 0</code>. If it has 0 copies, the transaction is rejected with an error notice.</li>
+              <li>If available, we decrement <code class="code-badge">book.availableCopies</code> by 1 and increment <code class="code-badge">book.issuedCopies</code> by 1.</li>
+              <li>We create a new transaction record with a unique <code class="code-badge">TXN-ID</code>, student info, issue date, 14-day due date, and status <code class="code-badge">"Issued"</code>.</li>
+              <li>We write the updated state back to localStorage and re-render the dashboard, tables, and dropdowns.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="viva-card">
+          <div class="viva-question">5. Explain the "Return Book" business logic.</div>
+          <div class="viva-answer">
+            When a student returns a book:
+            <ol style="margin: 8px 0 8px 20px;">
+              <li>We locate the active transaction with status <code class="code-badge">"Issued"</code> matching the Student ID and Book ID.</li>
+              <li>We increment <code class="code-badge">book.availableCopies</code> by 1 and decrement <code class="code-badge">book.issuedCopies</code> by 1.</li>
+              <li>We update the transaction status to <code class="code-badge">"Returned"</code> and record the actual <code class="code-badge">returnDate</code> as today's date.</li>
+              <li>We save the changes to localStorage and refresh all views.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="viva-card">
+          <div class="viva-question">6. How is real-time search implemented?</div>
+          <div class="viva-answer">
+            The search bar listens to the JavaScript <code class="code-badge">input</code> event. On every keystroke, it filters the <code class="code-badge">books</code> array using <code class="code-badge">Array.prototype.filter()</code> by comparing the lowercase query against the book's title, author, and ID. It then re-renders only the matching rows in the table.
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Main JavaScript File -->
+  <script src="./script.js"></script>
+</body>
+</html>

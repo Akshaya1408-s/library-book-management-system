@@ -1,0 +1,7 @@
+{
+  "name": "Library Book Management System",
+  "description": "A beginner-friendly college library book management system built with HTML, CSS, and JavaScript using localStorage.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
